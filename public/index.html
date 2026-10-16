@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Meu Perfil Acadêmico</title>
 
     <style>
@@ -189,6 +188,71 @@
             color: white;
         }
 
+        /* Seção de disciplinas */
+        .lista-disciplinas {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .disciplina {
+            border: 1px solid var(--borda);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--card);
+        }
+
+        .nome-disciplina {
+            color: var(--cor-principal);
+            font-weight: bold;
+            font-size: 1.05rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .nome-disciplina:hover {
+            text-decoration: underline;
+        }
+
+        .botoes-disciplina {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .botao-pequeno {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--cor-principal);
+            color: white;
+        }
+
+        .botao-pequeno:hover {
+            opacity: 0.85;
+        }
+
+        .botao-remover {
+            background: #dc2626;
+        }
+
+        .detalhes-disciplina {
+            margin-top: 10px;
+            color: var(--texto-secundario);
+            line-height: 1.6;
+        }
+
+        .mensagem-api {
+            margin-top: 12px;
+            color: var(--texto-secundario);
+            line-height: 1.5;
+        }
+
         footer {
             background: var(--card);
             border-top: 1px solid var(--borda);
@@ -197,7 +261,6 @@
             color: var(--texto-secundario);
         }
 
-        /* Tema escuro */
         body.escuro {
             --fundo: #111827;
             --card: #1f2937;
@@ -233,14 +296,12 @@
 </head>
 
 <body>
-
     <header>
         <h1>Meu Perfil Acadêmico</h1>
         <p>Conheça um pouco sobre meu perfil universitário</p>
 
-        <!-- Funcionalidades extras -->
         <div class="controles">
-            <button class="controle" onclick="alternarTema()">
+            <button class="controle" id="botaoTema" onclick="alternarTema()">
                 🌙 Alternar tema
             </button>
 
@@ -254,21 +315,15 @@
 
     <main>
         <section class="perfil">
-
-            <!-- RF02 - Fotografia -->
             <img
                 class="foto"
                 src="https://i.pravatar.cc/300?img=12"
                 alt="Fotografia do aluno"
             >
 
-            <!-- RF01 - Nome completo -->
             <h2>João da Silva Santos</h2>
-
-            <!-- RF03 - Curso -->
             <p class="curso">Bacharelado em Sistemas de Informação</p>
 
-            <!-- RF05 - Biografia -->
             <div class="secao">
                 <h3>Sobre mim</h3>
                 <p>
@@ -279,10 +334,8 @@
                 </p>
             </div>
 
-            <!-- RF04 - Hobbies -->
             <div class="secao">
                 <h3>Meus hobbies</h3>
-
                 <ul class="hobbies">
                     <li>💻 Programação</li>
                     <li>🎮 Jogos</li>
@@ -291,7 +344,17 @@
                 </ul>
             </div>
 
-            <!-- RF06 e RF07 -->
+            <!-- Disciplinas carregadas da API -->
+            <div class="secao" id="secaoDisciplinas">
+                <h3>Minhas disciplinas</h3>
+
+                <p id="mensagemDisciplinas" class="mensagem-api">
+                    Carregando disciplinas...
+                </p>
+
+                <ul id="listaDisciplinas" class="lista-disciplinas"></ul>
+            </div>
+
             <div class="acoes">
                 <button class="botao contato" onclick="entrarEmContato()">
                     Entrar em Contato
@@ -306,36 +369,35 @@
                     GitHub
                 </a>
             </div>
-
         </section>
     </main>
 
-    <!-- RF08 - Data atual -->
     <footer>
         <p>© <span id="ano"></span> Meu Perfil Acadêmico</p>
         <p>Data atual: <span id="dataAtual"></span></p>
     </footer>
 
     <script>
-        // RF06 - Mensagem ao clicar em "Entrar em Contato"
+        const API = "/api/disciplinas";
+
+        // Contato
         function entrarEmContato() {
             alert("Olá! Obrigado pelo contato. Em breve entrarei em contato com você.");
         }
 
-        // RF08 - Exibe automaticamente a data atual
+        // Data atual
         const hoje = new Date();
 
         document.getElementById("dataAtual").textContent =
             hoje.toLocaleDateString("pt-BR");
 
-        document.getElementById("ano").textContent =
-            hoje.getFullYear();
+        document.getElementById("ano").textContent = hoje.getFullYear();
 
-        // Funcionalidade extra 1 - Tema claro/escuro
+        // Tema claro/escuro
         function alternarTema() {
             document.body.classList.toggle("escuro");
 
-            const botao = document.querySelector(".controle");
+            const botao = document.getElementById("botaoTema");
 
             if (document.body.classList.contains("escuro")) {
                 botao.textContent = "☀️ Tema claro";
@@ -344,19 +406,208 @@
             }
         }
 
-        // Funcionalidade extra 2 - Alterar cor principal
+        // Cor principal
         function alterarCor(cor) {
-            document.documentElement.style.setProperty(
-                "--cor-principal",
-                cor
-            );
-
-            // Gera uma versão um pouco mais escura para o hover
-            document.documentElement.style.setProperty(
-                "--cor-principal-hover",
-                cor
-            );
+            document.documentElement.style.setProperty("--cor-principal", cor);
+            document.documentElement.style.setProperty("--cor-principal-hover", cor);
         }
+
+        // Elementos da lista
+        const lista = document.getElementById("listaDisciplinas");
+        const mensagem = document.getElementById("mensagemDisciplinas");
+
+        // Carrega as disciplinas da API
+        async function carregarDisciplinas() {
+            mensagem.textContent = "Carregando disciplinas...";
+            lista.replaceChildren();
+
+            try {
+                const resposta = await fetch(API);
+
+                if (!resposta.ok) {
+                    throw new Error(`Erro ao carregar: ${resposta.status}`);
+                }
+
+                const disciplinas = await resposta.json();
+
+                if (!Array.isArray(disciplinas)) {
+                    throw new Error("A API não retornou uma lista de disciplinas.");
+                }
+
+                if (disciplinas.length === 0) {
+                    mensagem.textContent = "Nenhuma disciplina cadastrada.";
+                    return;
+                }
+
+                mensagem.textContent = "";
+
+                disciplinas.forEach(disciplina => {
+                    lista.appendChild(criarItemDisciplina(disciplina));
+                });
+            } catch (erro) {
+                mensagem.textContent =
+                    `${erro.message}. Confira se o servidor está funcionando.`;
+            }
+        }
+
+        // Cria cada item da lista
+        function criarItemDisciplina(disciplina) {
+            const item = document.createElement("li");
+            item.className = "disciplina";
+            item.dataset.id = disciplina.id;
+
+            const nome = document.createElement("button");
+            nome.type = "button";
+            nome.className = "nome-disciplina";
+            nome.textContent = disciplina.nome || "Disciplina sem nome";
+            nome.title = "Clique para ver os detalhes";
+
+            // Etapa 2: clicar no nome mostra os detalhes
+            nome.addEventListener("click", () => {
+                mostrarDetalhes(disciplina.id, item);
+            });
+
+            const detalhes = document.createElement("div");
+            detalhes.className = "detalhes-disciplina";
+            detalhes.hidden = true;
+
+            const botoes = document.createElement("div");
+            botoes.className = "botoes-disciplina";
+
+            const botaoEditar = document.createElement("button");
+            botaoEditar.type = "button";
+            botaoEditar.className = "botao-pequeno";
+            botaoEditar.textContent = "✏️ Editar";
+
+            // Etapa 3: editar o nome usando PUT
+            botaoEditar.addEventListener("click", () => {
+                editarDisciplina(disciplina.id, nome);
+            });
+
+            const botaoRemover = document.createElement("button");
+            botaoRemover.type = "button";
+            botaoRemover.className = "botao-pequeno botao-remover";
+            botaoRemover.textContent = "🗑️ Remover";
+
+            // Etapa 1: remover usando DELETE
+            botaoRemover.addEventListener("click", () => {
+                removerDisciplina(disciplina.id, item);
+            });
+
+            botoes.append(botaoEditar, botaoRemover);
+            item.append(nome, detalhes, botoes);
+
+            return item;
+        }
+
+        // Etapa 1: DELETE /api/disciplinas/:id
+        async function removerDisciplina(id, elemento) {
+            try {
+                const resposta = await fetch(`${API}/${id}`, {
+                    method: "DELETE"
+                });
+
+                if (resposta.status === 204) {
+                    elemento.remove();
+
+                    if (lista.children.length === 0) {
+                        mensagem.textContent = "Nenhuma disciplina cadastrada.";
+                    }
+                } else {
+                    let dados = {};
+
+                    try {
+                        dados = await resposta.json();
+                    } catch (_) {}
+
+                    alert(dados.erro || `Erro ao remover: ${resposta.status}`);
+                }
+            } catch (erro) {
+                alert("Não foi possível conectar à API.");
+            }
+        }
+
+        // Etapa 2: GET /api/disciplinas/:id
+        async function mostrarDetalhes(id, elemento) {
+            const areaDetalhes =
+                elemento.querySelector(".detalhes-disciplina");
+
+            // Permite esconder os detalhes ao clicar novamente
+            if (!areaDetalhes.hidden) {
+                areaDetalhes.hidden = true;
+                return;
+            }
+
+            areaDetalhes.hidden = false;
+            areaDetalhes.textContent = "Carregando detalhes...";
+
+            try {
+                const resposta = await fetch(`${API}/${id}`);
+
+                if (resposta.status === 404) {
+                    areaDetalhes.textContent = "";
+                    alert("Disciplina não encontrada.");
+                    return;
+                }
+
+                if (!resposta.ok) {
+                    throw new Error(`Erro: ${resposta.status}`);
+                }
+
+                const disciplina = await resposta.json();
+
+                areaDetalhes.textContent =
+                    `ID: ${disciplina.id} | Período: ${
+                        disciplina.periodo ?? "Não informado"
+                    }`;
+            } catch (erro) {
+                areaDetalhes.textContent = "";
+                alert(erro.message || "Não foi possível buscar os detalhes.");
+            }
+        }
+
+        // Etapa 3: PUT /api/disciplinas/:id
+        async function editarDisciplina(id, elementoNome) {
+            const nome = prompt("Digite o novo nome da disciplina:");
+
+            // Cancelar não envia requisição
+            if (nome === null) {
+                return;
+            }
+
+            try {
+                const resposta = await fetch(`${API}/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        nome: nome
+                    })
+                });
+
+                let dados = {};
+
+                try {
+                    dados = await resposta.json();
+                } catch (_) {}
+
+                if (resposta.status === 200) {
+                    elementoNome.textContent = dados.nome;
+                } else if (resposta.status === 400) {
+                    alert(dados.erro || "Nome é obrigatório.");
+                } else if (resposta.status === 404) {
+                    alert(dados.erro || "Disciplina não encontrada.");
+                } else {
+                    alert(dados.erro || `Erro ao editar: ${resposta.status}`);
+                }
+            } catch (erro) {
+                alert("Não foi possível conectar à API.");
+            }
+        }
+
+        // Carrega a lista ao abrir a página
+        carregarDisciplinas();
     </script>
 </body>
-</html>
+</html

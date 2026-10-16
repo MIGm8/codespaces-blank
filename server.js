@@ -41,6 +41,62 @@ app.get("/api/disciplinas/:id", (req, res) => {
  res.json(disciplina);
 });
 
+app.get('/api/disciplinas/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    const disciplina = disciplinas.find(d => d.id === id);
+
+    if (!disciplina) {
+        return res.status(404).json({
+            erro: 'disciplina não encontrada'
+        });
+    }
+
+    res.status(200).json(disciplina);
+});
+
+app.delete('/api/disciplinas/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    const indice = disciplinas.findIndex(d => d.id === id);
+
+    if (indice === -1) {
+        return res.status(404).json({
+            erro: 'disciplina não encontrada'
+        });
+    }
+
+    disciplinas.splice(indice, 1);
+
+    res.status(204).send();
+});
+
+app.put('/api/disciplinas/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    const disciplina = disciplinas.find(d => d.id === id);
+
+    if (!disciplina) {
+        return res.status(404).json({
+            erro: 'disciplina não encontrada'
+        });
+    }
+
+    const { nome } = req.body || {};
+
+    if (typeof nome !== 'string' || !nome.trim()) {
+        return res.status(400).json({
+            erro: 'nome é obrigatório'
+        });
+    }
+
+    Object.assign(disciplina, req.body, {
+        nome: nome.trim()
+    });
+
+    res.status(200).json(disciplina);
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
